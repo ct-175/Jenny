@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>History of the United Kingdom (1600–Today)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    /* ========== RESET ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* ========== STATIC BACKGROUND (FLAG) ========== */
+    .background {
+      position: fixed;
+      inset: 0;
+      background: url("assets/uk-flag.png") center/cover no-repeat;
+      filter: brightness(0.7) blur(4px);
+      z-index: -2;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      z-index: -1;
+    }
+
+    /* ========== SLIDE BASE ========== */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+      transition:
+        opacity 380ms ease,
+        transform 380ms ease;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    /* ========== CARD / LIQUID GLASS ========== */
+    .card {
+      width: 100%;
+      max-width: 1100px;
+      padding: 30px 38px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(18px) saturate(1.15);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    }
+
+    /* ========== TYPOGRAPHY ========== */
+    .section-label {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: clamp(30px, 3.2vw, 38px);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(22px, 2.2vw, 26px);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: clamp(18px, 1.7vw, 20px);
+      opacity: 0.9;
+      margin-bottom: 18px;
+    }
+
+    p {
+      font-size: clamp(17px, 1.5vw, 19px);
+      line-height: 1.6;
+      opacity: 0.96;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      margin-top: 8px;
+    }
+
+    li {
+      font-size: clamp(16px, 1.4vw, 18px);
+      line-height: 1.5;
+      margin-bottom: 6px;
+      opacity: 0.96;
+    }
+
+    li strong {
+      font-weight: 600;
+    }
+
+    .key-message {
+      margin-top: 16px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      font-size: clamp(16px, 1.4vw, 18px);
+      opacity: 0.95;
+    }
+
+    /* ========== LAYOUT ========== */
+    .two-cols {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 22px;
+      margin-top: 12px;
+    }
+
+    .col {
+      min-width: 0;
+    }
+
+    /* ========== NAVIGATION ========== */
+    .nav {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+    }
+
+    .nav-indicator {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-right: 6px;
+    }
+
+    .nav button {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        background 140ms ease,
+        transform 140ms ease,
+        border-color 140ms ease,
+        opacity 140ms ease;
+    }
+
+    .nav button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.65);
+      transform: translateY(-2px);
+    }
+
+    .nav button:disabled {
+      opacity: 0.4;
+      cursor: default;
+      transform: none;
+    }
+
+    /* ========== PROGRESS BAR ========== */
+    .progress {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      width: min(380px, 82vw);
+      height: 4px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .progress-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffffff, #b8e1ff);
+      transition: width 260ms ease;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px 18px;
+        border-radius: 20px;
+      }
+
+      .two-cols {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nav {
+        bottom: 16px;
+        right: 16px;
+      }
+
+      .progress {
+        bottom: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- BACKGROUND -->
+  <div class="background"></div>
+  <div class="overlay"></div>
+
+  <!-- ========== SLIDE 0 – TITLE ========== -->
+  <section class="slide active" data-index="0">
+    <div class="card">
+      <div class="section-label">History of the United Kingdom</div>
+      <h1>The History of the United Kingdom (1600–Today)</h1>
+      <p class="subtitle">
+        From the East India Company to Brexit: how a kingdom transformed over four centuries.
+      </p>
+      <p>
+        This presentation traces how the UK developed from an emerging trading power around 1600 into a modern
+        democracy facing new global challenges today.
+      </p>
+      <p class="key-message">
+        Guiding question: <strong>How did political change, economic power and global connections shape the United Kingdom?</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 1 – OVERVIEW ========== -->
+  <section class="slide" data-index="1">
+    <div class="card">
+      <div class="section-label">Overview</div>
+      <h1>What this presentation covers</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Main themes</h2>
+          <ul>
+            <li><strong>Political change:</strong> from civil war to constitutional monarchy and devolution.</li>
+            <li><strong>Economic transformation:</strong> industrialisation, global trade, and structural change.</li>
+            <li><strong>Empire and decolonisation:</strong> rise and decline of British global power.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Time frame & focus</h2>
+          <ul>
+            <li><strong>Starting point:</strong> around 1600 with the East India Company.</li>
+            <li><strong>End point:</strong> the UK after Brexit in the 21st century.</li>
+            <li><strong>Perspective:</strong> key turning points, not every detail.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        The goal is not just to list events, but to show <strong>how and why</strong> the UK changed over time.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 2 – 1600: EIC ========== -->
+  <section class="slide" data-index="2">
+    <div class="card">
+      <div class="section-label">Early modern Britain</div>
+      <h1>1600 – The East India Company</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Foundations of global power</h2>
+          <ul>
+            <li><strong>1600:</strong> The East India Company is founded as a joint‑stock trading company.</li>
+            <li><strong>Royal charter:</strong> grants monopolies over trade in Asia.</li>
+            <li><strong>Private army:</strong> later builds its own military forces and forts.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Why it matters</h2>
+          <ul>
+            <li><strong>From trade to power:</strong> economic interests turn into political influence.</li>
+            <li><strong>India as key region:</strong> becomes central to British wealth and strategy.</li>
+            <li><strong>Long‑term impact:</strong> sets the stage for a global British presence.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        Around 1600, Britain is not yet a global empire – but <strong>structures of overseas power</strong> begin to form.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 3 – CIVIL WAR & GLORIOUS REVOLUTION ========== -->
+  <section class="slide" data-index="3">
+    <div class="card">
+      <div class="section-label">17th century</div>
+      <h1>Civil War and the birth of modern democracy</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>English Civil War (1642–1651)</h2>
+          <ul>
+            <li><strong>Conflict:</strong> King (Charles I) vs. Parliament over power and religion.</li>
+            <li><strong>Outcome:</strong> Charles I is executed in 1649.</li>
+            <li><strong>Cromwell's republic:</strong> England briefly becomes a republic under Oliver Cromwell.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Glorious Revolution (1688)</h2>
+          <ul>
+            <li><strong>James II removed:</strong> Parliament invites William and Mary to take the throne.</li>
+            <li><strong>Bill of Rights (1689):</strong> limits royal power, strengthens Parliament.</li>
+            <li><strong>Result:</strong> a constitutional monarchy with Parliament at the centre.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        The 17th century turns England into a <strong>constitutional monarchy</strong> – a key model for later democracies.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 4 – 1707 UNION ========== -->
+  <section class="slide" data-index="4">
+    <div class="card">
+      <div class="section-label">State formation</div>
+      <h1>1707 – The Acts of Union</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Creating Great Britain</h2>
+          <ul>
+            <li><strong>Before 1707:</strong> England and Scotland share a monarch, but have separate parliaments.</li>
+            <li><strong>Acts of Union (1707):</strong> merge both parliaments into one in Westminster.</li>
+            <li><strong>New state:</strong> the <em>Kingdom of Great Britain</em> is created.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Why it matters</h2>
+          <ul>
+            <li><strong>Unified market:</strong> shared economy and trade policy.</li>
+            <li><strong>Common foreign policy:</strong> a single voice in European and global affairs.</li>
+            <li><strong>Basis for later UK:</strong> foundation of the modern British state.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        1707 marks the shift from separate kingdoms to a <strong>single British state</strong> with growing ambitions.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 5 – EXPANSION & EARLY INDUSTRIALISATION ========== -->
+  <section class="slide" data-index="5">
+    <div class="card">
+      <div class="section-label">18th century</div>
+      <h1>Expansion overseas and early industrialisation</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Global expansion</h2>
+          <ul>
+            <li><strong>1757: Battle of Plassey:</strong> Company gains control over Bengal.</li>
+            <li><strong>North America:</strong> 13 colonies grow, then rebel.</li>
+            <li><strong>American Revolution (1775–1783):</strong> Britain loses the United States.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Industrial beginnings</h2>
+          <ul>
+            <li><strong>New technologies:</strong> steam engine, spinning machines.</li>
+            <li><strong>Factories:</strong> textile production moves from homes to mills.</li>
+            <li><strong>Urban growth:</strong> people move from countryside to towns.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        Even after losing the American colonies, Britain grows stronger by combining
+        <strong>industrial power and overseas trade.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 6 – 1801 UK & IRELAND ========== -->
+  <section class="slide" data-index="6">
+    <div class="card">
+      <div class="section-label">19th century</div>
+      <h1>1801 – The United Kingdom and Ireland</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Union with Ireland</h2>
+          <ul>
+            <li><strong>1801:</strong> Act of Union joins Great Britain and Ireland.</li>
+            <li><strong>Name:</strong> <em>United Kingdom of Great Britain and Ireland</em>.</li>
+            <li><strong>Reason:</strong> fear of French influence and Irish rebellion.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Partition later on</h2>
+          <ul>
+            <li><strong>Irish nationalism:</strong> grows in the 19th century.</li>
+            <li><strong>1921:</strong> Ireland is partitioned.</li>
+            <li><strong>Today:</strong> only Northern Ireland remains part of the UK.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        The union with Ireland shows both the <strong>reach and limits</strong> of British control within the islands.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 7 – VICTORIAN ERA ========== -->
+  <section class="slide" data-index="7">
+    <div class="card">
+      <div class="section-label">19th century</div>
+      <h1>The Victorian Era (1837–1901)</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Industrial and global power</h2>
+          <ul>
+            <li><strong>Queen Victoria:</strong> reigns during a period of huge change.</li>
+            <li><strong>Industry:</strong> coal, steel, railways, shipbuilding.</li>
+            <li><strong>Empire:</strong> Britain rules territories on every continent.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Society and reform</h2>
+          <ul>
+            <li><strong>Urbanisation:</strong> rapid growth of cities.</li>
+            <li><strong>Social problems:</strong> poverty, child labour, poor housing.</li>
+            <li><strong>Reforms:</strong> factory acts, more people gain the right to vote.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        In the 19th century, Britain becomes a <strong>global industrial power</strong>, but this also creates
+        <strong>deep social tensions.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 8 – IRISH FAMINE ========== -->
+  <section class="slide" data-index="8">
+    <div class="card">
+      <div class="section-label">19th century</div>
+      <h1>The Irish Famine (1845–1849)</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>What happened</h2>
+          <ul>
+            <li><strong>Potato blight:</strong> destroys the main food source of many Irish peasants.</li>
+            <li><strong>British response:</strong> limited aid, continued exports of food.</li>
+            <li><strong>Human cost:</strong> about one million deaths, one million people emigrate.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Long‑term impact</h2>
+          <ul>
+            <li><strong>Deep bitterness:</strong> famine seen as a symbol of British misrule.</li>
+            <li><strong>Emigration:</strong> strong Irish communities in the USA and elsewhere.</li>
+            <li><strong>Nationalism:</strong> fuels movements for Irish independence.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        The famine is a turning point: it shapes <strong>Ireland's relationship with Britain</strong> for generations.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 9 – WORLD WARS ========== -->
+  <section class="slide" data-index="9">
+    <div class="card">
+      <div class="section-label">20th century</div>
+      <h1>The World Wars (1914–1945)</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>World War I</h2>
+          <ul>
+            <li><strong>Global conflict:</strong> Britain fights with its empire and allies.</li>
+            <li><strong>Colonial troops:</strong> soldiers from India, Africa and other regions.</li>
+            <li><strong>Social change:</strong> women enter new jobs, demand political rights.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>World War II</h2>
+          <ul>
+            <li><strong>The Blitz:</strong> German bombing of British cities, especially London.</li>
+            <li><strong>Leadership:</strong> Winston Churchill becomes a symbol of resistance.</li>
+            <li><strong>Aftermath:</strong> Britain wins, but is economically weakened.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        The World Wars strengthen British identity, but also show the <strong>limits of British power</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 10 – WELFARE & DECOLONISATION ========== -->
+  <section class="slide" data-index="10">
+    <div class="card">
+      <div class="section-label">Post‑war Britain</div>
+      <h1>Welfare state and decolonisation (1945–1970)</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Building a welfare state</h2>
+          <ul>
+            <li><strong>1948: NHS created:</strong> free healthcare for all citizens.</li>
+            <li><strong>Social reforms:</strong> housing, education, social security expand.</li>
+            <li><strong>Goal:</strong> reduce poverty and inequality after the war.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>End of the empire</h2>
+          <ul>
+            <li><strong>Independence movements:</strong> India, Pakistan, African and Caribbean nations.</li>
+            <li><strong>Commonwealth:</strong> former colonies join a loose organisation with the UK.</li>
+            <li><strong>Suez Crisis (1956):</strong> shows Britain is no longer a superpower.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        After 1945, Britain shifts from ruling an empire to focusing on
+        <strong>social security at home</strong> and a more limited global role.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 11 – EUROPE & THATCHER ========== -->
+  <section class="slide" data-index="11">
+    <div class="card">
+      <div class="section-label">Late 20th century</div>
+      <h1>Europe and Thatcher (1970–1990)</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Europe</h2>
+          <ul>
+            <li><strong>1973:</strong> UK joins the European Economic Community (EEC).</li>
+            <li><strong>Economic goal:</strong> access to a larger common market.</li>
+            <li><strong>Debate:</strong> sovereignty vs. economic benefits.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Thatcher era</h2>
+          <ul>
+            <li><strong>Prime Minister (1979–1990):</strong> Margaret Thatcher.</li>
+            <li><strong>Policies:</strong> privatisation, deregulation, weakening of trade unions.</li>
+            <li><strong>Impact:</strong> modernisation for some, social division for others.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        The late 20th century forces Britain to balance <strong>national traditions</strong> with
+        <strong>European integration and economic change.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 12 – DEVOLUTION & PEACE ========== -->
+  <section class="slide" data-index="12">
+    <div class="card">
+      <div class="section-label">Contemporary UK</div>
+      <h1>Devolution and peace in Northern Ireland</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Devolution (from 1997)</h2>
+          <ul>
+            <li><strong>Scotland:</strong> new parliament in Edinburgh.</li>
+            <li><strong>Wales:</strong> own assembly (later parliament) in Cardiff.</li>
+            <li><strong>Northern Ireland:</strong> power‑sharing assembly in Belfast.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Good Friday Agreement (1998)</h2>
+          <ul>
+            <li><strong>Ends the Troubles:</strong> decades of conflict in Northern Ireland.</li>
+            <li><strong>Power‑sharing:</strong> unionists and nationalists share government.</li>
+            <li><strong>Cross‑border cooperation:</strong> stronger ties with the Republic of Ireland.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        Devolution and the peace process show how the UK tries to deal with
+        <strong>internal diversity and conflict.</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 13 – BREXIT & MODERN UK ========== -->
+  <section class="slide" data-index="13">
+    <div class="card">
+      <div class="section-label">21st century</div>
+      <h1>Brexit and the modern United Kingdom</h1>
+
+      <div class="two-cols">
+        <div class="col">
+          <h2>Brexit (2016–2020)</h2>
+          <ul>
+            <li><strong>2016 referendum:</strong> 52% vote to leave the EU, 48% to remain.</li>
+            <li><strong>Divisions:</strong> younger vs. older, Scotland vs. England, cities vs. countryside.</li>
+            <li><strong>2020:</strong> UK formally leaves the European Union.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>New role and challenges</h2>
+          <ul>
+            <li><strong>Trade:</strong> new agreements outside the EU.</li>
+            <li><strong>Unity of the UK:</strong> debates about Scottish independence and Irish border.</li>
+            <li><strong>Identity:</strong> ongoing discussion about what it means to be "British" today.</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="key-message">
+        Brexit forces the UK to redefine its <strong>place in Europe and the wider world</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 14 – CONCLUSION ========== -->
+  <section class="slide" data-index="14">
+    <div class="card">
+      <div class="section-label">Conclusion</div>
+      <h1>What the history of the UK shows</h1>
+
+      <p>
+        Since 1600, the United Kingdom has changed from a rising trading nation into an industrial power, an imperial
+        centre, and finally a modern democracy facing new global and internal challenges.
+      </p>
+      <p>
+        Its history is shaped by <strong>conflict and compromise, expansion and retreat, innovation and inequality</strong>.
+        Understanding these developments helps explain current debates about identity, Europe, and the future of the UK.
+      </p>
+      <p class="key-message">
+        The central question remains: <strong>How can the UK balance its traditions with the need to adapt in a changing world?</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ========== NAVIGATION & PROGRESS ========== -->
+  <div class="nav">
+    <span class="nav-indicator" id="navIndicator">1 / 15</span>
+    <button id="prevBtn" aria-label="Previous slide">&larr;</button>
+    <button id="nextBtn" aria-label="Next slide">&rarr;</button>
+  </div>
+
+  <div class="progress">
+    <div class="progress-inner" id="progressInner"></div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const navIndicator = document.getElementById("navIndicator");
+    const progressInner = document.getElementById("progressInner");
+
+    let index = 0;
+    const total = slides.length;
+
+    function updateSlides() {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
+
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === total - 1;
+
+      navIndicator.textContent = `${index + 1} / ${total}`;
+      const progress = ((index + 1) / total) * 100;
+      progressInner.style.width = progress + "%";
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (index > 0) {
+        index--;
+        updateSlides();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (index < total - 1) {
+        index++;
+        updateSlides();
+      }
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") {
+        nextBtn.click();
+      } else if (e.key === "ArrowLeft") {
+        prevBtn.click();
+      }
+    });
+
+    updateSlides();
+  </script>
+</body>
+</html>
